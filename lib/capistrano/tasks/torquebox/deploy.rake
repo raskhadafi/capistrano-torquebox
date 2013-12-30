@@ -1,8 +1,7 @@
-def create_deployment_descriptor( root )
+def create_deployment_descriptor(root_path)
   dd = {
     'application' => {
-      # Force the encoding to UTF-8 on 1.9 since the value may be ASCII-8BIT, which marshals as an encoded bytestream, not a String.
-      'root' => "#{root.respond_to?(:force_encoding) ? root.force_encoding('UTF-8') : root}",
+      'root' => "#{root_path.respond_to?(:force_encoding) ? root_path.force_encoding('UTF-8') : root_path}",
     },
   }
 
@@ -110,6 +109,8 @@ namespace :deploy do
         info "jboss_init_script.....#{fetch(:jboss_init_script)}"
         info "jruby_home............#{fetch(:jruby_home)}"
         info "bundle command........#{fetch(:bundle_cmd)}"
+        info "knob.yml.............."
+        puts YAML.dump(create_deployment_descriptor(current_path))
       end
     end
 
@@ -137,7 +138,7 @@ namespace :deploy do
     task :deployment_descriptor do
       puts "creating deployment descriptor"
 
-      dd_str  = YAML.dump_stream( create_deployment_descriptor(current_path) )
+      dd_str  = YAML.dump_stream(create_deployment_descriptor(current_path))
       dd_file = "#{fetch(:jboss_home)}/standalone/deployments/#{fetch(:torquebox_app_name, fetch(:application))}-knob.yml"
       cmd     =  "cat /dev/null > #{dd_file}"
 
@@ -176,7 +177,7 @@ namespace :deploy do
         dd = create_deployment_descriptor(current_path)
         puts dd
         exit
-        puts YAML.dump(create_deployment_descriptor(current_path ))
+        puts YAML.dump(create_deployment_descriptor(current_path))
       end
     end
   end

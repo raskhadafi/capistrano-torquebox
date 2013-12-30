@@ -6,8 +6,6 @@ Torquebox support for Capistrano v3:
 
 ## Notes
 
-**If you use this integration with capistrano-rails, please ensure that you have `capistrano-bundler >= 1.1.0`.**
-
 ## Installation
 
 Add this line to your application's Gemfile:

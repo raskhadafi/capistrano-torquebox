@@ -50,17 +50,17 @@ namespace :deploy do
     desc "Start TorqueBox Server"
     task :start do
       on roles(:app), in: :sequence, wait: 5 do
-        puts "Starting TorqueBox AS"
+        info "Starting TorqueBox AS"
 
         case fetch(:jboss_control_style)
-          when :initd
-            execute "#{sudo} #{fetch(:jboss_init_script)} start"
-          when :binscripts
-            execute "nohup #{fetch(:jboss_home)}/bin/standalone.sh -b #{fetch(:jboss_bind_address)} < /dev/null > /dev/null 2>&1 &"
-          when :runit
-            execute "#{sudo} sv start torquebox"
-          when :upstart
-            execute "#{sudo} service torquebox start"
+        when 'initd'
+          execute "#{sudo} #{fetch(:jboss_init_script)} start"
+        when 'binscripts'
+          execute "nohup #{fetch(:jboss_home)}/bin/standalone.sh -b #{fetch(:jboss_bind_address)} < /dev/null > /dev/null 2>&1 &"
+        when 'runit'
+          execute "#{sudo} sv start torquebox"
+        when 'upstart'
+          execute "#{sudo} service torquebox start"
         end
       end
     end
@@ -68,16 +68,16 @@ namespace :deploy do
     desc "Stop TorqueBox Server"
     task :stop do
       on roles(:app), in: :sequence, wait: 5 do
-        puts "Stopping TorqueBox AS"
+        info "Stopping TorqueBox AS"
 
         case fetch(:jboss_control_style)
-          when :initd
-            execute "#{sudo} JBOSS_HOME=#{fetch(:jboss_home)} #{jboss_init_script} stop"
-          when :binscripts
+          when 'initd'
+            execute "#{sudo} JBOSS_HOME=#{fetch(:jboss_home)} #{fetch(:jboss_init_script)} stop"
+          when 'binscripts'
             execute "#{fetch(:jboss_home)}/bin/jboss-cli.sh --connect :shutdown"
-          when :runit
+          when 'runit'
             execute "#{sudo} sv stop torquebox"
-          when :upstart
+          when 'upstart'
             execute "#{sudo} service torquebox stop"
         end
       end
@@ -87,17 +87,17 @@ namespace :deploy do
     task :restart do
       on roles(:app), in: :sequence, wait: 5 do
         case ( fetch(:jboss_control_style) )
-          when :initd
-            puts    "Restarting TorqueBox AS"
+          when 'initd'
+            info    "Restarting TorqueBox AS"
             execute "#{sudo} JBOSS_HOME=#{fetch(:jboss_home)} #{fetch(:jboss_init_script)} restart"
-          when :binscripts
+          when 'binscripts'
             execute "#{fetch(:jboss_home)}/bin/jboss-cli.sh --connect :shutdown"
             execute "nohup #{fetch(:jboss_home)}/bin/standalone.sh -bpublic=#{fetch(:jboss_bind_address)} < /dev/null > /dev/null 2>&1 &"
-          when :runit
-            puts    "Restarting TorqueBox AS"
+          when 'runit'
+            info    "Restarting TorqueBox AS"
             execute "#{sudo} sv restart torquebox"
-          when :upstart
-            puts    "Restarting TorqueBox AS"
+          when 'upstart'
+            info    "Restarting TorqueBox AS"
             execute "#{sudo} service torquebox restart"
         end
       end
@@ -105,10 +105,11 @@ namespace :deploy do
 
     task :info do
       on roles(:app), in: :sequence, wait: 5 do
-        puts "torquebox_home.....#{fetch(:torquebox_home)}"
-        puts "jboss_home.........#{fetch(:jboss_home)}"
-        puts "jruby_home.........#{fetch(:jruby_home)}"
-        puts "bundle command.....#{fetch(:bundle_cmd)}"
+        info "torquebox_home........#{fetch(:torquebox_home)}"
+        info "jboss_home............#{fetch(:jboss_home)}"
+        info "jboss_init_script.....#{fetch(:jboss_init_script)}"
+        info "jruby_home............#{fetch(:jruby_home)}"
+        info "bundle command........#{fetch(:bundle_cmd)}"
       end
     end
 
@@ -117,11 +118,11 @@ namespace :deploy do
 
       on roles(:app), in: :sequence, wait: 5 do
         case fetch(:jboss_control_style)
-        when :initd
+        when 'initd'
           execute "test -x #{fetch(:jboss_init_script)}"
-        when :runit
+        when 'runit'
           execute "test -x #{fetch(:jboss_runit_script)}"
-        when :upstart
+        when 'upstart'
           execute "test -x #{fetch(:jboss_upstart_script)}"
         end
 

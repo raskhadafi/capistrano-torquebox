@@ -2,7 +2,7 @@ namespace :load do
   task :defaults do
     set :torquebox_home, fetch(:torquebox_home, '/opt/torquebox')
 
-    set :jruby_home, fetch(:jruby_home,          proc { "#{fetch(:torquebox_home)}/jruby" } )
+    set :jruby_home, fetch(:jruby_home, "#{fetch(:torquebox_home)}/jruby")
     if fetch(:app_ruby_version) && !fetch(:jruby_opts)
       set :jruby_opts, fetch(:jruby_opts,          proc { "--#{fetch(:app_ruby_version)}" } )
     end

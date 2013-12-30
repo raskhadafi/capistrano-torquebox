@@ -1,3 +1,43 @@
+def create_deployment_descriptor( root )
+  dd = {
+    'application' => {
+      # Force the encoding to UTF-8 on 1.9 since the value may be ASCII-8BIT, which marshals as an encoded bytestream, not a String.
+      'root' => "#{root.respond_to?(:force_encoding) ? root.force_encoding('UTF-8') : root}",
+    },
+  }
+
+  if fetch(:app_host)
+    dd['web'] ||= {}
+    dd['web']['host'] = fetch(:app_host)
+  end
+
+  if  fetch(:app_context)
+    dd['web'] ||= {}
+    dd['web']['context'] = fetch(:app_context)
+  end
+
+  if  fetch(:app_ruby_version)
+    dd['ruby'] ||= {}
+    dd['ruby']['version'] = fetch(:app_ruby_version)
+  end
+
+  if  fetch(:app_environment)
+    dd['environment'] = fetch(:app_environment)
+  end
+
+  if  fetch(:rails_env)
+    dd['environment'] ||= {}
+    dd['environment']['RAILS_ENV'] = fetch(:rails_env)
+  end
+
+  if fetch(:stomp_host)
+    dd['stomp'] ||= {}
+    dd['stomp']['host'] = fetch(:stomp_host)
+  end
+
+  dd
+end
+
 namespace :deploy do
   desc "Restart Application"
   task :restart do

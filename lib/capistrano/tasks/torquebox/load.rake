@@ -18,6 +18,6 @@ namespace :load do
     set :bundle_cmd, fetch(:bundle_cmd, proc { "#{fetch(:jruby_bin)} -S bundle" })
     set :bundle_flags, fetch(:bundle_flags, '')
 
-    set :torquebox_app_name, fetch(:torquebox_app_name,  proc { fetch(:application) })
+    # set :torquebox_app_name, fetch(:torquebox_app_name, '')
   end
 end

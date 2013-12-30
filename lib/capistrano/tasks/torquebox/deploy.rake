@@ -54,13 +54,13 @@ namespace :deploy do
 
         case fetch(:jboss_control_style)
         when 'initd'
-          execute "#{sudo} #{fetch(:jboss_init_script)} start"
+          execute "#{fetch(:jboss_init_script)} start"
         when 'binscripts'
           execute "nohup #{fetch(:jboss_home)}/bin/standalone.sh -b #{fetch(:jboss_bind_address)} < /dev/null > /dev/null 2>&1 &"
         when 'runit'
-          execute "#{sudo} sv start torquebox"
+          execute "sv start torquebox"
         when 'upstart'
-          execute "#{sudo} service torquebox start"
+          execute "service torquebox start"
         end
       end
     end
@@ -72,13 +72,13 @@ namespace :deploy do
 
         case fetch(:jboss_control_style)
           when 'initd'
-            execute "#{sudo} JBOSS_HOME=#{fetch(:jboss_home)} #{fetch(:jboss_init_script)} stop"
+            execute "JBOSS_HOME=#{fetch(:jboss_home)} #{fetch(:jboss_init_script)} stop"
           when 'binscripts'
             execute "#{fetch(:jboss_home)}/bin/jboss-cli.sh --connect :shutdown"
           when 'runit'
-            execute "#{sudo} sv stop torquebox"
+            execute "sv stop torquebox"
           when 'upstart'
-            execute "#{sudo} service torquebox stop"
+            execute "service torquebox stop"
         end
       end
     end
@@ -89,16 +89,16 @@ namespace :deploy do
         case ( fetch(:jboss_control_style) )
           when 'initd'
             info    "Restarting TorqueBox AS"
-            execute "#{sudo} JBOSS_HOME=#{fetch(:jboss_home)} #{fetch(:jboss_init_script)} restart"
+            execute "JBOSS_HOME=#{fetch(:jboss_home)} #{fetch(:jboss_init_script)} restart"
           when 'binscripts'
             execute "#{fetch(:jboss_home)}/bin/jboss-cli.sh --connect :shutdown"
             execute "nohup #{fetch(:jboss_home)}/bin/standalone.sh -bpublic=#{fetch(:jboss_bind_address)} < /dev/null > /dev/null 2>&1 &"
           when 'runit'
             info    "Restarting TorqueBox AS"
-            execute "#{sudo} sv restart torquebox"
+            execute "sv restart torquebox"
           when 'upstart'
             info    "Restarting TorqueBox AS"
-            execute "#{sudo} service torquebox restart"
+            execute "service torquebox restart"
         end
       end
     end

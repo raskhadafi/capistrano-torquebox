@@ -1,7 +1,7 @@
 namespace :deploy do
   desc "Restart Application"
   task :restart do
-    on except: { no_release: true } do
+    on roles(:app), in: :sequence, wait: 5 do
       run "touch #{jboss_home}/standalone/deployments/#{torquebox_app_name}-knob.yml.dodeploy"
     end
   end
@@ -9,9 +9,9 @@ namespace :deploy do
   namespace :torquebox do
     desc "Start TorqueBox Server"
     task :start do
-      on except: { no_release: true } do
+      on roles(:app), in: :sequence, wait: 5 do
         puts "Starting TorqueBox AS"
-        case ( jboss_control_style )
+        case ( fetch(:jboss_control_style) )
           when :initd
             run "#{sudo} #{jboss_init_script} start"
           when :binscripts
@@ -26,9 +26,9 @@ namespace :deploy do
 
     desc "Stop TorqueBox Server"
     task :stop do
-      on except: { no_release: true } do
+      on roles(:app), in: :sequence, wait: 5 do
         puts "Stopping TorqueBox AS"
-        case ( jboss_control_style )
+        case ( fetch(:jboss_control_style) )
           when :initd
             run "#{sudo} JBOSS_HOME=#{jboss_home} #{jboss_init_script} stop"
           when :binscripts
@@ -43,8 +43,8 @@ namespace :deploy do
 
     desc "Restart TorqueBox Server"
     task :restart do
-      on except: { no_release: true } do
-        case ( jboss_control_style )
+      on roles(:app), in: :sequence, wait: 5 do
+        case ( fetch(:jboss_control_style) )
           when :initd
             puts "Restarting TorqueBox AS"
             run "#{sudo} JBOSS_HOME=#{jboss_home} #{jboss_init_script} restart"
@@ -62,7 +62,7 @@ namespace :deploy do
     end
 
     task :info do
-      on except: { no_release: true } do
+      on roles(:app), in: :sequence, wait: 5 do
         puts "torquebox_home.....#{torquebox_home}"
         puts "jboss_home.........#{jboss_home}"
         puts "jruby_home.........#{jruby_home}"
@@ -71,25 +71,28 @@ namespace :deploy do
     end
 
     task :check do
-      on except: { no_release: true } do
-      puts "style #{jboss_control_style}"
-        case jboss_control_style
+      on roles(:app), in: :sequence, wait: 5 do
+        puts "style #{fetch(:jboss_control_style)}"
+
+        case fetch(:jboss_control_style)
         when :initd
-          run "test -x #{jboss_init_script}",                      :roles=>[ :app ]
+          execute "test -x #{fetch(:jboss_init_script)}"
         when :runit
-          run "test -x #{jboss_runit_script}",                     :roles=>[ :app ]
+          execute "test -x #{fetch(:jboss_runit_script)}"
         when :upstart
-          run "test -x #{jboss_upstart_script}",                   :roles=>[ :app ]
+          execute "test -x #{fetch(:jboss_upstart_script)}"
         end
-        run "test -d #{jboss_home}",                               :roles=>[ :app ]
-        unless ( [ :initd, :binscripts, :runit, :upstart ].include?( jboss_control_style.to_sym ) )
-          fail "invalid jboss_control_style: #{jboss_control_style}"
+
+        execute "test -d #{fetch(:jboss_home)}"
+
+        unless ( %w[initd binscripts runit upstart].include?( fetch(:jboss_control_style) ) )
+          error "invalid fetch(:jboss_control_style): #{fetch(:jboss_control_style)}"
         end
       end
     end
 
     task :deployment_descriptor do
-      on except: { no_release: true } do
+      on roles(:app), in: :sequence, wait: 5 do
         puts "creating deployment descriptor"
         dd_str = YAML.dump_stream( create_deployment_descriptor(current_path) )
         dd_file = "#{jboss_home}/standalone/deployments/#{torquebox_app_name}-knob.yml"
@@ -116,7 +119,7 @@ namespace :deploy do
 
     desc "Dump the deployment descriptor"
     task :dump do
-      on except: { no_release: true } do
+      on roles(:app), in: :sequence, wait: 5 do
         dd = create_deployment_descriptor( current_path )
         puts dd
         exit
@@ -124,35 +127,36 @@ namespace :deploy do
       end
     end
   end
+end
 
-  namespace :load do
-    task :defaults do
-      set( :torquebox_home,      '/opt/torquebox' ) unless exists?( :torquebox_home )
+namespace :load do
+  task :defaults do
+    puts 'go'
+    set :torquebox_home, fetch(:torquebox_home, '/opt/torquebox')
 
-      set( :jruby_home,          lambda{ "#{torquebox_home}/jruby" } ) unless exists?( :jruby_home )
-      if exists?( :app_ruby_version ) && !exists?( :jruby_opts )
-        set( :jruby_opts,          lambda{ "--#{app_ruby_version}" } )
-      end
-      set( :jruby_bin,           lambda{ "#{jruby_home}/bin/jruby #{jruby_opts if exists?( :jruby_opts )}" } ) unless exists?( :jruby_bin )
-
-      set( :jboss_home,          lambda{ "#{torquebox_home}/jboss" } ) unless exists?( :jboss_home )
-      set( :jboss_control_style, :initd ) unless exists?( :jboss_control_style )
-      set( :jboss_init_script,   '/etc/init.d/jboss-as-standalone' ) unless exists?( :jboss_init_script )
-      set( :jboss_runit_script,  '/etc/service/torquebox/run' ) unless exists?( :jboss_runit_script)
-      set( :jboss_upstart_script,  '/etc/init/torquebox.conf' ) unless exists?( :jboss_upstart_script)
-      set( :jboss_bind_address,  '0.0.0.0' ) unless exists?( :jboss_bind_address )
-
-      set( :bundle_cmd,          lambda{ "#{jruby_bin} -S bundle" } ) unless exists?( :bundle_cmd )
-      set( :bundle_flags,        '' ) unless exists?( :bundle_flags )
-
-      set( :torquebox_app_name,  lambda{ application } ) unless exists?( :torquebox_app_name )
+    set :jruby_home, fetch(:jruby_home,          proc { "#{fetch(:torquebox_home)}/jruby" } )
+    if exists?( :app_ruby_version ) && !exists?( :jruby_opts )
+      set :jruby_opts, fetch(:jruby_opts,          proc { "--#{fetch(:app_ruby_version)}" } )
     end
+    set :jruby_bin, fetch(:jruby_bin, proc { "#{fetch(:jruby_home)}/bin/jruby #{fetch(:jruby_opts)}" })
+
+    set :jboss_home, fetch(:jboss_home, proc { "#{fetch(:torquebox_home)}/jboss" })
+    set :jboss_control_style, fetch(:jboss_control_style, 'initd' )
+    set :jboss_init_script, fetch(:jboss_init_script,   '/etc/init.d/jboss-as-standalone' )
+    set :jboss_runit_script, fetch(:jboss_runit_script,  '/etc/service/torquebox/run' )
+    set :jboss_upstart_script, fetch(:jboss_upstart_script,  '/etc/init/torquebox.conf')
+    set :jboss_bind_address, fetch(:jboss_bind_address, '0.0.0.0')
+
+    set :bundle_cmd, fetch(:bundle_cmd, proc { "#{fetch(:jruby_bin)} -S bundle" })
+    set :bundle_flags, fetch(:bundle_flags, '')
+
+    set :torquebox_app_name, fetch(:torquebox_app_name,  proc { fetch(:application) })
   end
 end
 
 before 'deploy:check',             'deploy:torquebox:check'
-after  'deploy:create_symlink',    'deploy:torquebox:deployment_descriptor'
-after  'deploy:rollback:revision', 'deploy:torquebox:rollback_deployment_descriptor'
+after  'deploy:symlink:shared',    'deploy:torquebox:deployment_descriptor'
+after  'deploy:rollback',          'deploy:torquebox:rollback_deployment_descriptor'
 
 __END__
 

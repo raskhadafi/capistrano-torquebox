@@ -186,31 +186,3 @@ end
 before 'deploy:check',             'deploy:torquebox:check'
 after  'deploy:symlink:shared',    'deploy:torquebox:deployment_descriptor'
 after  'deploy:rollback',          'deploy:torquebox:rollback_deployment_descriptor'
-
-__END__
-
-module Capistrano
-  class Configuration
-
-  end
-
-  module TorqueBox
-
-    def self.load_into( configuration )
-
-      configuration.load do
-        # --
-
-
-        namespace :deploy do
-
-          namespace :torquebox do
-
-
-        end
-
-
-      end
-    end
-  end
-end

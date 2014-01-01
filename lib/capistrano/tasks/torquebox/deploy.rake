@@ -26,7 +26,7 @@ def create_deployment_descriptor(root_path)
 
   if  fetch(:rails_env)
     dd['environment'] ||= {}
-    dd['environment']['RAILS_ENV'] = fetch(:rails_env)
+    dd['environment']['RACK_ENV'] = fetch(:rails_env)
   end
 
   if fetch(:stomp_host)

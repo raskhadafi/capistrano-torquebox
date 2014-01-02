@@ -140,16 +140,10 @@ namespace :deploy do
 
       dd_str  = YAML.dump_stream(create_deployment_descriptor(current_path))
       dd_file = "#{fetch(:jboss_home)}/standalone/deployments/#{fetch(:torquebox_app_name, fetch(:application))}-knob.yml"
-      cmd     =  "cat /dev/null > #{dd_file}"
-
-      dd_str.each_line do |line|
-        cmd += " && echo \"#{line}\" >> #{dd_file}"
-      end
-
-      cmd += " && echo '' >> #{dd_file}"
+      dd_io   = StringIO.new(dd_str)
 
       on roles(:app), in: :sequence, wait: 5 do
-        execute cmd
+        upload!(dd_io, dd_file)
       end
     end
 
@@ -158,16 +152,10 @@ namespace :deploy do
 
       dd_str  = YAML.dump_stream(create_deployment_descriptor(previous_release))
       dd_file = "#{fetch(:jboss_home)}/standalone/deployments/#{fetch(:application)}-knob.yml"
-      cmd     =  "cat /dev/null > #{dd_file}"
-
-      dd_str.each_line do |line|
-        cmd += " && echo \"#{line}\" >> #{dd_file}"
-      end
-
-      cmd += " && echo '' >> #{dd_file}"
+      dd_io   = StringIO.new(dd_str)
 
       on roles(:app), in: :sequence, wait: 5 do
-        execute cmd
+        upload!(dd_io, dd_file)
       end
     end
 

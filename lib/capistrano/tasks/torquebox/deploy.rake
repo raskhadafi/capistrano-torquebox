@@ -34,6 +34,13 @@ def create_deployment_descriptor(root_path)
     dd['stomp']['host'] = fetch(:stomp_host)
   end
 
+
+  filename = fetch(:knob_yml_extensions)
+  if filename
+    dd_ext = YAML.load_file(filename)
+    dd.merge! dd_ext
+  end
+
   dd
 end
 

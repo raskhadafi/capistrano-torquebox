@@ -147,9 +147,9 @@ namespace :deploy do
 
       dd_str  = YAML.dump_stream(create_deployment_descriptor(release_path))
       dd_file = "#{fetch(:jboss_home)}/standalone/deployments/#{fetch(:torquebox_app_name, fetch(:application))}-knob.yml"
-      dd_io   = StringIO.new(dd_str)
 
       on roles(:app), in: :sequence, wait: 5 do
+        dd_io   = StringIO.new(dd_str)
         upload!(dd_io, dd_file)
       end
     end

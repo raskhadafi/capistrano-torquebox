@@ -1,6 +1,7 @@
 # Capistrano::Torquebox
 
 This gem is based on the 'torquebox-capistrano-support' gem.
+The changes are documented [here](CHANGELOG.md).
 
 Torquebox support for Capistrano v3:
 

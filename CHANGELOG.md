@@ -6,6 +6,7 @@
 #### Release date: 2014-02-26
 
 1. Deployment descriptor upload bug fixed on multi-server deployment.
+1. Rake task for proper versioning added.
 
 ### Version 0.2.0
 #### Release date: 2014-02-16

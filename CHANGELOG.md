@@ -2,6 +2,11 @@
 
 ## Changelog
 
+### Version 0.2.1
+#### Release date: 2014-02-26
+
+1. Deployment descriptor upload bug fixed on multi-server deployment.
+
 ### Version 0.2.0
 #### Release date: 2014-02-16
 

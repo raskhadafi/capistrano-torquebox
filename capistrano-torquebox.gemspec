@@ -2,9 +2,11 @@
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
+require 'capistrano/torquebox/version'
+
 Gem::Specification.new do |spec|
   spec.name          = "capistrano-torquebox"
-  spec.version       = '0.2.0'
+  spec.version       = Capistrano::Torquebox::Version
   spec.authors       = ["Roman Simecek"]
   spec.email         = ["roman@good2go.ch"]
   spec.summary       = %q{Torquebox support for Capistrano 3.x}

@@ -16,5 +16,7 @@ rule /^version:bump:.*/ do |t|
     f.write(version_file.sub(old_version, new_version))
   end
 
-  sh "rake install && git add #{file} && git commit -m 'Bump version to #{new_version}' && git tag version-#{new_version} && git push && git push --tags"
+  sh "rake install && git add #{file} && git commit -m 'Bump version to #{new_version}'"
+
+  Rake::Task['release'].execute
 end

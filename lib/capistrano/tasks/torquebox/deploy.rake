@@ -131,7 +131,7 @@ namespace :deploy do
         when 'runit'
           execute "test -x #{fetch(:jboss_runit_script)}"
         when 'upstart'
-          execute "test -f #{fetch(:jboss_upstart_script)}"
+          test "[[ -f #{fetch(:jboss_upstart_script)} ]]"
         end
 
         execute "test -d #{fetch(:jboss_home)}"

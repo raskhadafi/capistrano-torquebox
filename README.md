@@ -3,6 +3,8 @@
 This gem is based on the 'torquebox-capistrano-support' gem.
 The changes are documented [here](CHANGELOG.md).
 
+Push requests are welcome!
+
 Torquebox support for Capistrano v3:
 
 ## Notes

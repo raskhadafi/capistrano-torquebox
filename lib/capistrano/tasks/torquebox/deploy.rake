@@ -66,7 +66,7 @@ namespace :deploy do
         when 'runit'
           execute "sv start torquebox"
         when 'upstart'
-          execute "service torquebox start"
+          sudo "service torquebox start"
         end
       end
     end
@@ -84,7 +84,7 @@ namespace :deploy do
           when 'runit'
             execute "sv stop torquebox"
           when 'upstart'
-            execute "service torquebox stop"
+            sudo "service torquebox stop"
         end
       end
     end
@@ -104,7 +104,7 @@ namespace :deploy do
             execute "sv restart torquebox"
           when 'upstart'
             info    "Restarting TorqueBox AS"
-            execute "service torquebox restart"
+            sudo "service torquebox restart"
         end
       end
     end
